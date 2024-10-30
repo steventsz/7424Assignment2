@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "774632116071",
+    "project_id": "project-1603889842535155666",
+    "storage_bucket": "project-1603889842535155666.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774632116071:android:59a974eeeb4235a75929c2",
+        "android_client_info": {
+          "package_name": "cs.unitec.steve.a7424"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANNw40I3ZYMawVJ-_qYoVGvzBIK938Sow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
