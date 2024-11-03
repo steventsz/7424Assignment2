@@ -104,6 +104,29 @@
                 android:layout_height="wrap_content"
                 android:gravity="end">
 
+                <TextView
+                    android:id="@+id/tournament_item_likes_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    />
+
+                <ImageView
+                    android:id="@+id/tournament_item_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_thumb_up_gray_24"
+                    android:visibility="gone"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="Like" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    />
+
                 <Button
                     android:id="@+id/tournament_item_answer_btn"
                     android:layout_width="wrap_content"
@@ -126,6 +149,20 @@
                     android:visibility="gone"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:textColor="@color/black" />
+
+                <Space
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    />
+                <Button
+                    android:id="@+id/tournament_item_delete_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:visibility="gone"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:textColor="@color/black"
+                    />
 
             </LinearLayout>
 

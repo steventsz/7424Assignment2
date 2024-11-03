@@ -2,8 +2,10 @@ package cs.unitec.steve.a7424;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -13,7 +15,6 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,17 +56,34 @@ public class ManagerHomeActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(v -> gotoEditOrAdd());
 
         recyclerView = findViewById(R.id.manager_home_recycler);
-        adapter = new TournamentAdapter(listData, true, null, new TournamentAdapter.OnEditListener() {
-            @Override
-            public void onEdit(String id) {
-                // 管理者编辑比赛的逻辑
-                Intent intent = new Intent(ManagerHomeActivity.this, TournamentFormActivity.class);
-                intent.putExtra("isEdit", true);
-                intent.putExtra("id", id);
-                startActivity(intent);
-            }
-        });
-
+        adapter = new TournamentAdapter(auth.getCurrentUser().getUid(), listData, true,
+                new TournamentAdapter.OnAnswerListener() {
+                    @Override
+                    public void onAnswer(String id) {
+                        // Not applicable for manager, left empty
+                    }
+                },
+                new TournamentAdapter.OnEditListener() {
+                    @Override
+                    public void onEdit(String id) {
+                        Intent intent = new Intent(ManagerHomeActivity.this, TournamentFormActivity.class);
+                        intent.putExtra("isEdit", true);
+                        intent.putExtra("id", id);
+                        startActivity(intent);
+                    }
+                },
+                new TournamentAdapter.OnDeleteListener() {
+                    @Override
+                    public void onDelete(String id) {
+                        showDeleteConfirmationDialog(id);
+                    }
+                },
+                new TournamentAdapter.OnLikeListener() {
+                    @Override
+                    public void onLike(String id, boolean isLiked) {
+                        toggleLike(id, isLiked);
+                    }
+                });
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         refreshTournaments();
@@ -104,5 +122,33 @@ public class ManagerHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(ManagerHomeActivity.this, TournamentFormActivity.class);
         intent.putExtra("isEdit", false);
         startActivity(intent);
+    }
+
+    private void showDeleteConfirmationDialog(String id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Alert")
+                .setMessage("Confirm delete?")
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    dialog.dismiss();
+                    deleteTournament(id);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void deleteTournament(String id) {
+        indicator.setIndeterminate(true);
+        fireStore.collection("tournaments").document(id)
+                .delete()
+                .addOnSuccessListener(aVoid -> refreshTournaments())
+                .addOnFailureListener(e -> indicator.setIndeterminate(false));
+    }
+
+    private void toggleLike(String id, boolean isLiked) {
+        fireStore.collection("tournaments").document(id)
+                .update("likes", isLiked ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null)
+                .addOnSuccessListener(aVoid -> refreshTournaments())
+                .addOnFailureListener(e -> {});
     }
 }

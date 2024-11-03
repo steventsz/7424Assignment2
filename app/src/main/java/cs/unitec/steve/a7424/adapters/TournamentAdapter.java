@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
@@ -22,12 +23,18 @@ public class TournamentAdapter extends RecyclerView.Adapter<TournamentAdapter.To
     private boolean canEdit;
     private OnAnswerListener onAnswer;
     private OnEditListener onEdit;
+    private OnDeleteListener onDelete;
+    private OnLikeListener onLike;
+    private String uid;
 
-    public TournamentAdapter(List<Tournament> data, boolean canEdit, OnAnswerListener onAnswer, OnEditListener onEdit) {
+    public TournamentAdapter(String uid, List<Tournament> data, boolean canEdit, OnAnswerListener onAnswer, OnEditListener onEdit, OnDeleteListener onDelete, OnLikeListener onLike) {
+        this.uid = uid;
         this.data = (data != null) ? data : new ArrayList<>();
         this.canEdit = canEdit;
         this.onAnswer = onAnswer;
         this.onEdit = onEdit;
+        this.onDelete = onDelete;
+        this.onLike = onLike;
     }
 
     public void update(List<Tournament> data) {
@@ -90,11 +97,22 @@ public class TournamentAdapter extends RecyclerView.Adapter<TournamentAdapter.To
 
         if (canEdit) {
             holder.btnEdit.setVisibility(View.VISIBLE);
+            holder.btnDelete.setVisibility(View.VISIBLE);
+            holder.likesCount.setVisibility(View.VISIBLE);
+            holder.likesCount.setText("likes: " + d.getLikes().size());
         } else {
             holder.btnAnswer.setVisibility(View.VISIBLE);
+            holder.imgLike.setVisibility(View.VISIBLE);
+            if (d.getLikes().contains(uid)) {
+                holder.imgLike.setImageResource(R.drawable.baseline_thumb_up_24);
+            } else {
+                holder.imgLike.setImageResource(R.drawable.baseline_thumb_up_gray_24);
+            }
         }
         holder.btnEdit.setOnClickListener(v -> onEdit.onEdit(d.getId()));
+        holder.btnDelete.setOnClickListener(v -> onDelete.onDelete(d.getId()));
         holder.btnAnswer.setOnClickListener(v -> onAnswer.onAnswer(d.getId()));
+        holder.imgLike.setOnClickListener(v -> onLike.onLike(d.getId(), d.getLikes().contains(uid)));
     }
 
     public class TournamentHolder extends RecyclerView.ViewHolder {
@@ -106,7 +124,10 @@ public class TournamentAdapter extends RecyclerView.Adapter<TournamentAdapter.To
         TextView dateRangeTxt;
         TextView cateTxt;
         Button btnEdit;
+        Button btnDelete;
         Button btnAnswer;
+        ImageView imgLike;
+        TextView likesCount;
 
         public TournamentHolder(View itemView) {
             super(itemView);
@@ -118,7 +139,10 @@ public class TournamentAdapter extends RecyclerView.Adapter<TournamentAdapter.To
             dateRangeTxt = view.findViewById(R.id.tournament_item_date_range);
             cateTxt = view.findViewById(R.id.tournament_item_cate);
             btnEdit = view.findViewById(R.id.tournament_item_edit_btn);
+            btnDelete = view.findViewById(R.id.tournament_item_delete_btn);
             btnAnswer = view.findViewById(R.id.tournament_item_answer_btn);
+            imgLike = view.findViewById(R.id.tournament_item_like);
+            likesCount = view.findViewById(R.id.tournament_item_likes_count);
         }
     }
 
@@ -128,6 +152,14 @@ public class TournamentAdapter extends RecyclerView.Adapter<TournamentAdapter.To
 
     public interface OnEditListener {
         void onEdit(String id);
+    }
+
+    public interface OnDeleteListener {
+        void onDelete(String id);
+    }
+
+    public interface OnLikeListener {
+        void onLike(String id, boolean isLiked);
     }
 }
 
